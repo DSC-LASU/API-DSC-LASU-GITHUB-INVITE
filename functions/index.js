@@ -109,7 +109,7 @@ app.post("/", async (req, res) => {
           return res.status(401).json({
             status: false,
             message: response.statusText,
-            body: "Invitee is already a part of this DSC-LASU. 😊",
+            body: messages.join('<br>'),
           });
         });
       }
