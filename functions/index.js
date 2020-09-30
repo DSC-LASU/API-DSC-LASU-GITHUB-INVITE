@@ -1,16 +1,19 @@
 const functions = require('firebase-functions');
+// const app = require('../server');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+// const functions = require('firebase-functions');
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require('cors');
 const app = express();
 const fetch = require("node-fetch");
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(bodyParser.json());
-app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const host = "https://api.github.com";
 // const token = "42de1fb0e4adc020ae9d8aaf4267ac47901c0725";
@@ -18,36 +21,9 @@ const token = functions.config().org.token;
 
 const org = functions.config().org.name;
 
-// this is to prevent CORS errors
-app.use(function (req, res, next) {
-  /*var err = new Error('Not Found');
-   err.status = 404;
-   next(err);*/
-
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "*");
-
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization"
-  );
-
-  //  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-  // Pass to next layer of middleware
-  next();
-});
-
 app.post("/", async (req, res) => {
   console.log("started connceting")
-  if(!req.body.username || req.body.username == undefined) return res.status(400).json({ 
+  if(!req.body.username || req.body.username === undefined) return res.status(400).json({ 
     status: false, 
     message: "missing username", 
     body: "please provide a username"})
@@ -88,12 +64,13 @@ app.post("/", async (req, res) => {
     }).then((response) => {
       // respond apprioprately
       if (response.status == 201) {
-        res.status(201).json({
+       return res.status(201).json({
           status: true,
           message: "Successfully Invited",
           body: `Dear ${req.body.username},<br>Kindly check your inbox and accept the invitation that has been sent to you.<br>Thank you!`,
         });
       } else {
+        // eslint-disable-next-line promise/catch-or-return
         response.json().then((data) => {
           let messages = [data.message];
           if (data.errors) {
@@ -101,7 +78,7 @@ app.post("/", async (req, res) => {
               messages.push(error.message);
             }
           }
-          res.status(401).json({
+        return res.status(401).json({
             status: false,
             message: response.statusText,
             body: messages.join("<br>"),
@@ -110,7 +87,7 @@ app.post("/", async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "An Error Occured",
       body: error.toString(),
@@ -123,5 +100,12 @@ app.listen(PORT, () => {
   console.log("Connected Successfully");
 });
 
-module.exports = app();
+// module.exports = app();
 // exports.app = functions.https.onRequest(app);
+
+
+
+// // Create and Deploy Your First Cloud Functions
+// // https://firebase.google.com/docs/functions/write-firebase-functions
+//
+exports.app = functions.https.onRequest(app);
