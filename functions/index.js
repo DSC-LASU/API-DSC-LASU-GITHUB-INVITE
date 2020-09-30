@@ -95,7 +95,7 @@ app.post("/", async (req, res) => {
         return res.status(201).json({
           status: true,
           message: "Successfully Invited",
-          body: `Dear ${req.body.username},<br>Kindly check your inbox and accept the invitation that has been sent to you.<br>Thank you!`,
+          body: `Dear ${req.body.username},Kindly check your inbox and accept the invitation that has been sent to you. Thank you!`,
         });
       } else {
         // eslint-disable-next-line promise/catch-or-return
@@ -109,7 +109,7 @@ app.post("/", async (req, res) => {
           return res.status(401).json({
             status: false,
             message: response.statusText,
-            body: messages.join("<br>"),
+            body: "Invitee is already a part of this DSC-LASU. 😊",
           });
         });
       }

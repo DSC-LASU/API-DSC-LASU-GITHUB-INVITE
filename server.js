@@ -1,7 +1,7 @@
-const functions = require('firebase-functions');
+const functions = require("firebase-functions");
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require('cors');
+const cors = require("cors");
 const app = express();
 const fetch = require("node-fetch");
 const PORT = process.env.PORT || 5000;
@@ -46,11 +46,13 @@ app.use(function (req, res, next) {
 });
 
 app.post("/", async (req, res) => {
-  console.log("started connceting")
-  if(!req.body.username || req.body.username == undefined) return res.status(400).json({ 
-    status: false, 
-    message: "missing username", 
-    body: "please provide a username"})
+  console.log("started connceting");
+  if (!req.body.username || req.body.username == undefined)
+    return res.status(400).json({
+      status: false,
+      message: "missing username",
+      body: "please provide a username",
+    });
   try {
     // check if github account exists with the given username, if no return that the username is invalid
     const user = await fetch(
@@ -65,9 +67,9 @@ app.post("/", async (req, res) => {
       });
 
     // ensure that GitHub organization exists else return
-    const organization = await fetch(
-      `${host}/orgs/${org}`
-    ).then((response) => response.json());
+    const organization = await fetch(`${host}/orgs/${org}`).then((response) =>
+      response.json()
+    );
 
     if (!organization.id)
       return res.status(401).json({
@@ -91,7 +93,7 @@ app.post("/", async (req, res) => {
         res.status(201).json({
           status: true,
           message: "Successfully Invited",
-          body: `Dear ${req.body.username},<br>Kindly check your inbox and accept the invitation that has been sent to you.<br>Thank you!`,
+          body: `Dear ${req.body.username}, Kindly check your inbox and accept the invitation that has been sent to you. Thank you!`,
         });
       } else {
         response.json().then((data) => {
@@ -104,7 +106,7 @@ app.post("/", async (req, res) => {
           res.status(401).json({
             status: false,
             message: response.statusText,
-            body: messages.join("<br>"),
+            body: "Invitee is already a part of this DSC-LASU 😊",
           });
         });
       }
