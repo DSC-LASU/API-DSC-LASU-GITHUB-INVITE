@@ -1,4 +1,9 @@
 const functions = require('firebase-functions');
+// const app = require('../server');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+// const functions = require('firebase-functions');
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
@@ -18,7 +23,7 @@ const org = functions.config().org.name;
 
 app.post("/", async (req, res) => {
   console.log("started connceting")
-  if(!req.body.username || req.body.username == undefined) return res.status(400).json({ 
+  if(!req.body.username || req.body.username === undefined) return res.status(400).json({ 
     status: false, 
     message: "missing username", 
     body: "please provide a username"})
@@ -59,12 +64,13 @@ app.post("/", async (req, res) => {
     }).then((response) => {
       // respond apprioprately
       if (response.status == 201) {
-        res.status(201).json({
+       return res.status(201).json({
           status: true,
           message: "Successfully Invited",
           body: `Dear ${req.body.username},<br>Kindly check your inbox and accept the invitation that has been sent to you.<br>Thank you!`,
         });
       } else {
+        // eslint-disable-next-line promise/catch-or-return
         response.json().then((data) => {
           let messages = [data.message];
           if (data.errors) {
@@ -72,7 +78,7 @@ app.post("/", async (req, res) => {
               messages.push(error.message);
             }
           }
-          res.status(401).json({
+        return res.status(401).json({
             status: false,
             message: response.statusText,
             body: messages.join("<br>"),
@@ -81,7 +87,7 @@ app.post("/", async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "An Error Occured",
       body: error.toString(),
@@ -94,5 +100,12 @@ app.listen(PORT, () => {
   console.log("Connected Successfully");
 });
 
-module.exports = app();
+// module.exports = app();
 // exports.app = functions.https.onRequest(app);
+
+
+
+// // Create and Deploy Your First Cloud Functions
+// // https://firebase.google.com/docs/functions/write-firebase-functions
+//
+exports.app = functions.https.onRequest(app);
