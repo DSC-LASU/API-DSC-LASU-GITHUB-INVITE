@@ -1,17 +1,46 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require('cors');
 const app = express();
 const fetch = require("node-fetch");
 const PORT = process.env.PORT || 5000;
 
-
-app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
 
 const host = "https://api.github.com";
 const token = "42de1fb0e4adc020ae9d8aaf4267ac47901c0725";
 const org = "dsc-lasu";
+
+// this is to prevent CORS errors
+app.use(function (req, res, next) {
+  /*var err = new Error('Not Found');
+   err.status = 404;
+   next(err);*/
+
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  // Request methods you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+
+  // Request headers you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization"
+  );
+
+  //  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  // Pass to next layer of middleware
+  next();
+});
 
 app.post("/", async (req, res) => {
   try {
