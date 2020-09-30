@@ -14,6 +14,11 @@ const token = "42de1fb0e4adc020ae9d8aaf4267ac47901c0725";
 const org = "dsc-lasu";
 
 app.post("/", async (req, res) => {
+  console.log("started connceting")
+  if(!req.body.username || req.body.username == undefined) return res.status(400).json({ 
+    status: false, 
+    message: "missing username", 
+    body: "please provide a username"})
   try {
     // check if github account exists with the given username, if no return that the username is invalid
     const user = await fetch(
